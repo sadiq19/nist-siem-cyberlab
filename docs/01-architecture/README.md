@@ -71,11 +71,11 @@ Test-Connection -Count 4 172.16.26.131
 
 **Pass criteria:** 0% loss to gateway and to both peer lab hosts. Failure: check VMware NIC on `vmnet8`, guest firewall ICMP, and that all three VMs share `172.16.26.0/24`.
 
-![EVIDENCE MISSING: Kali ping -c 4 to 172.16.26.131 and 172.16.26.132](../../assets/sprint-2/icmp-kali.png)
+![Kali → Ubuntu SIEM: ping -c 4 172.16.26.131, 0% loss](../../assets/sprint-2/kali-to-ubuntu-ping.png)
 
-![EVIDENCE MISSING: Ubuntu ping -c 4 to 172.16.26.128 and 172.16.26.132](../../assets/sprint-2/icmp-ubuntu.png)
+![Ubuntu SIEM → gateway: ping -c 4 172.16.26.2, 0% loss](../../assets/sprint-2/ubuntu-to-gateway-ping.png)
 
-![EVIDENCE MISSING: Windows Test-Connection to 172.16.26.128 and 172.16.26.131](../../assets/sprint-2/icmp-win11.png)
+![Windows → Ubuntu SIEM: ping 172.16.26.131, 0% loss](../../assets/sprint-2/windows-to-ubuntu-ping.png)
 
 ## Log pipeline (roles on this IP set)
 
