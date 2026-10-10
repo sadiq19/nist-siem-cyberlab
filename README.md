@@ -14,23 +14,21 @@ Work proceeds in eight sprints. One micro-task at a time. Proof screenshots go u
 
 ## Architecture
 
+Lab subnet `172.16.26.0/24` (VMware vmnet8 NAT). Gateway `172.16.26.2`.
+
 ```mermaid
 flowchart LR
-  EP["Linux endpoint\nauditd + rsyslog + Wazuh agent"]
-  REL["Rsyslog relay\nUDP/TCP 514 → TLS 6514"]
-  WM["Wazuh Manager\n1514/tcp agent, rules"]
-  IDX["Wazuh Indexer"]
-  DASH["Wazuh Dashboard"]
-  EP -->|"agent 1514/tcp"| WM
-  EP -->|"syslog TLS 6514"| REL
-  REL --> WM
-  WM --> IDX
-  IDX --> DASH
+  WIN["win11-client\n172.16.26.132\nWazuh agent / Sysmon"]
+  KALI["Kali Linux\n172.16.26.128\nattacker"]
+  UB["ubuntuserverlab\n172.16.26.130\nManager + Indexer + Dashboard"]
+  WIN -->|"1514/tcp agent"| UB
+  WIN -->|"6514/tcp syslog TLS"| UB
+  KALI -.->|"Sprint 6"| WIN
 ```
 
-Each endpoint sends two streams: Wazuh agent (encrypted 1514/tcp) and syslog over TLS 6514. Network devices use `configs/network/rsyslog-network.conf`. The manager evaluates `configs/wazuh/local_rules.xml` and writes JSON alerts to the indexer.
+`win11-client` is the target endpoint. It sends Wazuh agent traffic on `1514/tcp` to `ubuntuserverlab` (`172.16.26.130`). Optional syslog TLS uses `6514/tcp` (`configs/endpoints/rsyslog.conf`). Indexer and Dashboard are colocated on `.130`. Kali (`172.16.26.128`) is the attacker node, not a log source. The manager evaluates `configs/wazuh/local_rules.xml` and writes JSON alerts to the indexer.
 
-Detail: [docs/01-architecture/README.md](docs/01-architecture/README.md).
+IP matrix, ICMP checks, NIST mapping: [docs/01-architecture/README.md](docs/01-architecture/README.md).
 
 ## NIST mapping
 
@@ -38,21 +36,25 @@ File-to-control mapping: [docs/02-compliance-nist/README.md](docs/02-compliance-
 
 ## Layout
 
-| Path | Content |
-| --- | --- |
-| `.cursorrules` | Language, banned phrases, evidence rules, Mermaid |
-| `configs/wazuh/ossec.conf` | Manager/agent: remote, ruleset, localfile, indexer |
-| `configs/wazuh/local_rules.xml` | Custom rules 100001–100010 |
-| `configs/endpoints/rsyslog.conf` | Endpoint: RFC 3339, omfwd TLS 6514 |
-| `configs/endpoints/auditd.rules` | watches on passwd/shadow/sudoers, execve |
-| `configs/network/rsyslog-network.conf` | Relay for network devices |
-| `scripts/init_project.sh` | Creates missing directories, including `assets/sprint-1`–`8` |
-| `scripts/validate_configs.sh` | Layout, XML, banned phrases |
-| `docs/03-configuration-guide/` | Install and TLS |
-| `docs/04-testing-verification/` | Lab tests and expected hits |
-| `docs/05-post-mortem-lessons/` | NTP, decoder faults, noise |
-| `assets/sprint-X/` | Sprint proof (required path) |
-| `assets/screenshots/` | Legacy capture dirs (raw logs, alerts, dashboards) |
+
+| Path                                   | Content                                                      |
+| -------------------------------------- | ------------------------------------------------------------ |
+| `.cursorrules`                         | Language, banned phrases, evidence rules, Mermaid            |
+| `configs/wazuh/ossec.conf`             | Manager/agent: remote, ruleset, localfile, indexer           |
+| `configs/wazuh/local_rules.xml`        | Custom rules 100001–100010                                   |
+| `configs/endpoints/rsyslog.conf`       | Endpoint: RFC 3339, omfwd TLS 6514                           |
+| `configs/endpoints/auditd.rules`       | watches on passwd/shadow/sudoers, execve                     |
+| `configs/network/rsyslog-network.conf` | Relay for network devices                                    |
+| `scripts/init_project.sh`              | Creates missing directories, including `assets/sprint-1`–`8` |
+| `scripts/validate_configs.sh`          | Layout, XML, banned phrases                                  |
+| `docs/03-configuration-guide/`         | Install and TLS                                              |
+| `docs/04-testing-verification/`        | Lab tests and expected hits                                  |
+| `docs/05-post-mortem-lessons/`         | NTP, decoder faults, noise                                   |
+| `assets/sprint-X/`                     | Sprint proof (required path)                                 |
+| `assets/screenshots/`                  | Legacy capture dirs (raw logs, alerts, dashboards)           |
+
+
+
 
 ## Commands
 
