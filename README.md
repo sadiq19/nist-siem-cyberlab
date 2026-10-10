@@ -55,4 +55,19 @@ File-to-control mapping: [docs/02-compliance-nist/README.md](docs/02-compliance-
 | `assets/sprint-X/`                     | Sprint proof (required path)                                 |
 | `assets/screenshots/`                  | Legacy capture dirs (raw logs, alerts, dashboards)           |
 
+## Commands
 
+```bash
+bash scripts/init_project.sh
+bash scripts/validate_configs.sh
+```
+
+Validator exits 0 when required files exist, `local_rules.xml` parses as XML, and no markdown matches the phrase list in `.cursorrules`.
+
+## Evidence
+
+Where a Dashboard screenshot is required, use an explicit placeholder until the file is stored under `assets/sprint-X/`:
+
+`![EVIDENCE MISSING: describe the exact screenshot](assets/sprint-X/...)`
+
+Do not invent IPs, timestamps, or rule IDs that are not in `configs/`.
