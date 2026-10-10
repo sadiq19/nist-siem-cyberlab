@@ -1,0 +1,30 @@
+## auditd.rules — identitetsfiler og execve
+## Kopieres til /etc/audit/rules.d/99-nist-au.rules og lastes med augenrules --load
+## NIST SP 800-53 Rev. 5: AU-2, AU-3, AU-12. Wazuh: configs/wazuh/ossec.conf (localfile audit)
+## og configs/wazuh/local_rules.xml (100005–100007).
+
+## Buffer og feilmodus (1 = panic kun i lab; produksjon: 1 eller 2 etter policy)
+-b 8192
+-f 1
+-r 0
+
+## Unngå å revidere auditd selv unødvendig
+-a never,task
+
+## Identitet: passwd, shadow, group, gshadow
+-w /etc/passwd -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/group -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-w /etc/security/opasswd -p wa -k identity
+
+## Privilegier: sudoers
+-w /etc/sudoers -p wa -k sudoers
+-w /etc/sudoers.d -p wa -k sudoers
+
+## execve (64- og 32-biters ABI der relevant)
+-a always,exit -F arch=b64 -S execve -k execve
+-a always,exit -F arch=b32 -S execve -k execve
+
+## Lås regelsett (krever reboot for nye regler inntil unlocked)
+-e 2

@@ -1,0 +1,79 @@
+<!--
+  Wazuh lokale regler, ID-serie 100001–100010.
+  Lastes via <rule_dir>etc/rules</rule_dir> i configs/wazuh/ossec.conf.
+  Overordnede regler: ruleset 0095-sshd_rules.xml (5715, 5716),
+  0100-sudo_rules.xml (5401, 5402, 5407) og auditd-dekoder.
+  NIST SP 800-53 Rev. 5: AU-2, AU-6, AU-12.
+-->
+<group name="local,">
+
+  <rule id="100001" level="10" frequency="5" timeframe="120">
+    <if_matched_sid>5716</if_matched_sid>
+    <same_source_ip />
+    <description>Lokalt: fem SSH-autentiseringsfeil (sid 5716) fra samme kilde-IP innen 120 s.</description>
+    <group>authentication_failures,sshd,nist_800_53_AU.6,nist_800_53_AU.12,pci_dss_10.2.4,gpg13_7.1,</group>
+  </rule>
+
+  <rule id="100002" level="12" frequency="2" timeframe="180">
+    <if_matched_sid>100001</if_matched_sid>
+    <same_source_ip />
+    <description>Lokalt: gjentatt SSH brute-force-mønster (to treff på 100001 innen 180 s).</description>
+    <group>authentication_failures,sshd,nist_800_53_AU.6,attack,pci_dss_11.4,</group>
+  </rule>
+
+  <rule id="100003" level="5">
+    <if_sid>5401</if_sid>
+    <description>Lokalt: mislykket sudo (overordnet sid 5401, incorrect password attempt).</description>
+    <group>syslog,sudo,authentication_failed,nist_800_53_AU.2,nist_800_53_AU.12,</group>
+  </rule>
+
+  <rule id="100004" level="12">
+    <if_sid>5402</if_sid>
+    <description>Lokalt: sudo til root utført (overordnet sid 5402). Vurder mot tillatt kommando-liste.</description>
+    <group>syslog,sudo,privilege_escalation,nist_800_53_AU.6,nist_800_53_AU.12,</group>
+  </rule>
+
+  <rule id="100005" level="12">
+    <decoded_as>auditd</decoded_as>
+    <field name="audit.key">^identity$</field>
+    <description>Lokalt: auditd nøkkel identity (passwd/shadow/group), jf. configs/endpoints/auditd.rules.</description>
+    <group>auditd,identity,nist_800_53_AU.2,nist_800_53_AU.12,pci_dss_10.2.7,</group>
+  </rule>
+
+  <rule id="100006" level="10">
+    <decoded_as>auditd</decoded_as>
+    <field name="audit.key">^sudoers$</field>
+    <description>Lokalt: auditd nøkkel sudoers (endring i /etc/sudoers eller sudoers.d).</description>
+    <group>auditd,sudoers,nist_800_53_AU.2,nist_800_53_AU.9,nist_800_53_AU.12,</group>
+  </rule>
+
+  <rule id="100007" level="7">
+    <if_sid>80700</if_sid>
+    <field name="audit.key">^execve$</field>
+    <field name="audit.exe">/usr/bin/sudo|/usr/bin/su|/usr/sbin/visudo</field>
+    <description>Lokalt: auditd execve av sudo, su eller visudo (nøkkel execve).</description>
+    <group>auditd,execve,privilege_escalation,nist_800_53_AU.12,</group>
+  </rule>
+
+  <rule id="100008" level="12">
+    <if_sid>5407</if_sid>
+    <description>Lokalt: sudo forsøkt av bruker som ikke står i sudoers (sid 5407).</description>
+    <group>syslog,sudo,authentication_failed,nist_800_53_AU.6,</group>
+  </rule>
+
+  <rule id="100009" level="3">
+    <if_sid>5715</if_sid>
+    <description>Lokalt: vellykket SSH-innlogging (sid 5715). Nivå 3; brukes i korrelasjon.</description>
+    <group>authentication_success,sshd,nist_800_53_AU.2,nist_800_53_AU.12,</group>
+  </rule>
+
+  <rule id="100010" level="10" timeframe="300">
+    <if_sid>5715</if_sid>
+    <if_matched_sid>5716</if_matched_sid>
+    <same_source_ip />
+    <same_user />
+    <description>Lokalt: vellykket SSH (5715) etter autentiseringsfeil (5716) for samme bruker og kilde-IP innen 300 s.</description>
+    <group>authentication_success,sshd,nist_800_53_AU.6,attack,</group>
+  </rule>
+
+</group>
