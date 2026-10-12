@@ -81,14 +81,6 @@ Each host pings gateway `172.16.26.2` and both peer VMs. Result: 0% loss on all 
 
 ![Windows full-mesh: Test-Connection gateway .2, Kali .128, Ubuntu .131](../../assets/sprint-2/windows-icmp-matrix.png)
 
-### Earlier single-path captures
-
-![Kali → Ubuntu SIEM: ping -c 4 172.16.26.131, 0% loss](../../assets/sprint-2/kali-to-ubuntu-ping.png)
-
-![Ubuntu SIEM → gateway: ping -c 4 172.16.26.2, 0% loss](../../assets/sprint-2/ubuntu-to-gateway-ping.png)
-
-![Windows → Ubuntu SIEM: ping 172.16.26.131, 0% loss](../../assets/sprint-2/windows-to-ubuntu-ping.png)
-
 ## Log pipeline (roles on this IP set)
 
 ```mermaid
