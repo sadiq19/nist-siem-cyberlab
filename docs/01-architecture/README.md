@@ -71,6 +71,18 @@ Test-Connection -Count 4 172.16.26.131
 
 **Pass criteria:** 0% loss to gateway and to both peer lab hosts. Failure: check VMware NIC on `vmnet8`, guest firewall ICMP, and that all three VMs share `172.16.26.0/24`.
 
+### Full-mesh ICMP matrix (verified)
+
+Each host pings gateway `172.16.26.2` and both peer VMs. Result: 0% loss on all paths.
+
+![Kali full-mesh: ping gateway .2, Ubuntu .131, Windows .132](../../assets/sprint-2/kali-icmp-matrix.png)
+
+![Ubuntu SIEM full-mesh: ping gateway .2, Kali .128, Windows .132](../../assets/sprint-2/ubuntu-icmp-matrix.png)
+
+![Windows full-mesh: Test-Connection gateway .2, Kali .128, Ubuntu .131](../../assets/sprint-2/windows-icmp-matrix.png)
+
+### Earlier single-path captures
+
 ![Kali → Ubuntu SIEM: ping -c 4 172.16.26.131, 0% loss](../../assets/sprint-2/kali-to-ubuntu-ping.png)
 
 ![Ubuntu SIEM → gateway: ping -c 4 172.16.26.2, 0% loss](../../assets/sprint-2/ubuntu-to-gateway-ping.png)
