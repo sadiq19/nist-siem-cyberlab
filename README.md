@@ -20,7 +20,7 @@ Lab subnet `172.16.26.0/24` (VMware vmnet8 NAT). Gateway `172.16.26.2`.
 flowchart LR
   WIN["win11-client\n172.16.26.132\nWazuh agent / Sysmon"]
   KALI["Kali Linux\n172.16.26.128\nattacker"]
-  UB["ubuntuserverlab\n172.16.26.131\nManager + Indexer + Dashboard"]
+  UB["ubuntuserverlab\n172.16.26.133\nManager + Indexer + Dashboard"]
   WIN -->|"1514/tcp agent"| UB
   WIN -->|"6514/tcp syslog TLS"| UB
   KALI -.->|"Sprint 6"| WIN
@@ -28,7 +28,7 @@ flowchart LR
 
 
 
-`win11-client` is the target endpoint. It sends Wazuh agent traffic on `1514/tcp` to `ubuntuserverlab` (`172.16.26.131`). Optional syslog TLS uses `6514/tcp` (`configs/endpoints/rsyslog.conf`). Indexer and Dashboard are colocated on `.131`. Kali (`172.16.26.128`) is the attacker node, not a log source. The manager evaluates `configs/wazuh/local_rules.xml` and writes JSON alerts to the indexer.
+`win11-client` is the target endpoint. It sends Wazuh agent traffic on `1514/tcp` to `ubuntuserverlab` (`172.16.26.133`). Optional syslog TLS uses `6514/tcp` (`configs/endpoints/rsyslog.conf`). Indexer and Dashboard are colocated on `.133`. Kali (`172.16.26.128`) is the attacker node, not a log source. The manager evaluates `configs/wazuh/local_rules.xml` and writes JSON alerts to the indexer.
 
 IP matrix, ICMP checks, NIST mapping: [docs/01-architecture/README.md](docs/01-architecture/README.md).
 

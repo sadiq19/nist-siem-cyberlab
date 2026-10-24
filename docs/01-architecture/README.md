@@ -8,7 +8,7 @@ Lab topology on VMware `vmnet8` NAT. Addresses below are verified on the lab hos
 | --- | --- | --- | --- |
 | NAT gateway | VMware vmnet8 gateway | `172.16.26.2` | `172.16.26.0/24` |
 | Attacker | Kali Linux | `172.16.26.128` | Red-team node (Sprint 6) |
-| SIEM collector | `ubuntuserverlab` (Ubuntu Server) | `172.16.26.131` | Wazuh Manager; Indexer/Dashboard colocated on this host until split |
+| SIEM collector | `ubuntuserverlab` (Ubuntu Server) | `172.16.26.133` | Wazuh Manager; Indexer/Dashboard colocated on this host until split |
 | Target endpoint | `win11-client` (Windows 11) | `172.16.26.132` | Sysmon / agent target (Sprint 3–5) |
 
 **Ports (lab):**
@@ -17,8 +17,8 @@ Lab topology on VMware `vmnet8` NAT. Addresses below are verified on the lab hos
 | --- | --- | --- |
 | Endpoint → SIEM | `1514/tcp` | Wazuh agent (`connection=secure`) — `configs/wazuh/ossec.conf` |
 | Endpoint → SIEM | `6514/tcp` | rsyslog TLS (`omfwd` / GnuTLS) — `configs/endpoints/rsyslog.conf` |
-| SIEM UI | `443/tcp` | Wazuh Dashboard (on `172.16.26.131`) |
-| Indexer | `9200/tcp` | Wazuh Indexer HTTPS (on `172.16.26.131`) |
+| SIEM UI | `443/tcp` | Wazuh Dashboard (on `172.16.26.133`) |
+| Indexer | `9200/tcp` | Wazuh Indexer HTTPS (on `172.16.26.133`) |
 
 No separate rsyslog-relay IP is assigned in this lab. Network-device relay config (`configs/network/rsyslog-network.conf`) remains for a future host; do not point it at an invented address.
 
@@ -32,7 +32,7 @@ flowchart TB
   subgraph NAT["172.16.26.0/24"]
     KALI["Kali Linux\nattacker\n172.16.26.128"]
     WIN["win11-client\nWindows 11 endpoint\n172.16.26.132"]
-    UB["ubuntuserverlab\nWazuh Manager + Indexer + Dashboard\n172.16.26.131"]
+    UB["ubuntuserverlab\nWazuh Manager + Indexer + Dashboard\n172.16.26.133"]
   end
   GW --- NAT
   WIN -->|"1514/tcp agent"| UB
@@ -49,11 +49,11 @@ Run from each node. Record RTT and packet loss. Save proof under `assets/sprint-
 
 ```bash
 ping -c 4 172.16.26.2
-ping -c 4 172.16.26.131
+ping -c 4 172.16.26.133
 ping -c 4 172.16.26.132
 ```
 
-**From Ubuntu SIEM (`172.16.26.131`):**
+**From Ubuntu SIEM (`172.16.26.133`):**
 
 ```bash
 ping -c 4 172.16.26.2
@@ -66,7 +66,7 @@ ping -c 4 172.16.26.132
 ```powershell
 Test-Connection -Count 4 172.16.26.2
 Test-Connection -Count 4 172.16.26.128
-Test-Connection -Count 4 172.16.26.131
+Test-Connection -Count 4 172.16.26.133
 ```
 
 **Pass criteria:** 0% loss to gateway and to both peer lab hosts. Failure: check VMware NIC on `vmnet8`, guest firewall ICMP, and that all three VMs share `172.16.26.0/24`.
@@ -75,11 +75,11 @@ Test-Connection -Count 4 172.16.26.131
 
 Each host pings gateway `172.16.26.2` and both peer VMs. Result: 0% loss on all paths.
 
-![Kali full-mesh: ping gateway .2, Ubuntu .131, Windows .132](../../assets/sprint-2/kali-icmp-matrix.png)
+![Kali full-mesh: ping gateway .2, Ubuntu .133, Windows .132](../../assets/sprint-2/kali-icmp-matrix.png)
 
 ![Ubuntu SIEM full-mesh: ping gateway .2, Kali .128, Windows .132](../../assets/sprint-2/ubuntu-icmp-matrix.png)
 
-![Windows full-mesh: Test-Connection gateway .2, Kali .128, Ubuntu .131](../../assets/sprint-2/windows-icmp-matrix.png)
+![Windows full-mesh: Test-Connection gateway .2, Kali .128, Ubuntu .133](../../assets/sprint-2/windows-icmp-matrix.png)
 
 ## Log pipeline (roles on this IP set)
 
@@ -87,9 +87,9 @@ Each host pings gateway `172.16.26.2` and both peer VMs. Result: 0% loss on all 
 sequenceDiagram
   participant Win as win11-client 172.16.26.132
   participant Kali as Kali 172.16.26.128
-  participant Mgr as ubuntuserverlab 172.16.26.131
-  participant Idx as Indexer on .131
-  participant Dash as Dashboard on .131
+  participant Mgr as ubuntuserverlab 172.16.26.133
+  participant Idx as Indexer on .133
+  participant Dash as Dashboard on .133
 
   Note over Win,Mgr: Sprint 3–5: agent + Sysmon / audit path
   Win->>Mgr: 1514/tcp Wazuh agent
@@ -109,9 +109,9 @@ Linux-side generation (`auditd`, `sshd`, `sudo`) still maps to `configs/endpoint
 | --- | --- | --- |
 | Log generation | `win11-client` (later Sysmon); Linux configs `configs/endpoints/auditd.rules` | NIST SP 800-92 generation; SP 800-53 **AU-2**, **AU-12** |
 | Content / timestamps | RFC 3339 in `configs/endpoints/rsyslog.conf` | **AU-3**, **AU-8** |
-| Transport / protection | `1514/tcp` + `6514/tcp` TLS to `172.16.26.131` | **AU-9** |
+| Transport / protection | `1514/tcp` + `6514/tcp` TLS to `172.16.26.133` | **AU-9** |
 | Analysis / review | `configs/wazuh/local_rules.xml` on `ubuntuserverlab` | **AU-6** |
-| Storage | Indexer on `172.16.26.131` | SP 800-92 storage |
+| Storage | Indexer on `172.16.26.133` | SP 800-92 storage |
 
 ## File references
 
