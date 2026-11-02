@@ -33,7 +33,7 @@ In `wazuh-logtest`: paste an `sshd` “Failed password” line. Expect hit on si
 ## 3. Wazuh agent on Linux endpoint
 
 1. Install the agent from the same major version as the manager (Wazuh packages, not an arbitrary mirror).
-2. During install: manager address = FQDN for the 10.20.50.11 sketch, protocol tcp, port 1514.
+2. During install: manager address = `172.16.26.133` (`ubuntuserverlab`), protocol tcp, port 1514.
 3. Agent key: `manage_agents` on the manager, import on the agent, or use Wazuh enrollment (5510/tcp) if enabled — enrollment is not configured in repo `ossec.conf`; document the chosen method in the internal runbook.
 4. Copy the `<localfile>` blocks for `auth.log`/`secure`, `syslog`, and `audit.log` into `/var/ossec/etc/ossec.conf` on the agent.
 5. Start:
@@ -89,7 +89,7 @@ ss -lntp | grep 6514 || true
 
 ### Relay for network devices
 
-On 10.20.40.10: install the same TLS modules, copy `configs/network/rsyslog-network.conf` to `/etc/rsyslog.d/50-network-relay.conf`, create `/var/log/network` mode 0750, restart. Switches point syslog at the relay’s 514. The relay forwards on 6514.
+On `PLACEHOLDER.relay` (optional host; this lab has no dedicated relay IP): install the same TLS modules, copy `configs/network/rsyslog-network.conf` to `/etc/rsyslog.d/50-network-relay.conf`, create `/var/log/network` mode 0750, restart. Switches point syslog at the relay’s 514. The relay forwards on 6514 to `172.16.26.133` (or leave unused until a relay host is assigned).
 
 ## 6. Rule tuning
 
